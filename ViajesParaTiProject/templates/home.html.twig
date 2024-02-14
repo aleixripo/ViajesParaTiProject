@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <title>Listado de Proveedores</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+
+</head>
+
+<body>
+    <div class="container mt-5">
+        {% set content %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-center">Listado de Proveedores</h1>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserModal">Añadir
+                Usuario</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th class="align-middle">ID</th>
+                        <th class="align-middle">Nombre</th>
+                        <th class="align-middle">Correo Electrónico</th>
+                        <th class="align-middle">Teléfono de Contacto</th>
+                        <th class="align-middle">Tipo de Proveedor</th>
+                        <th class="align-middle">Activo</th>
+                        <th class="align-middle">Fecha de Actualización</th>
+                        <th class="align-middle">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supplier in suppliers %}
+                    <tr>
+                        <td>{{ supplier.id }}</td>
+                        <td>{{ supplier.name }}</td>
+                        <td>{{ supplier.email }}</td>
+                        <td>{{ supplier.phone }}</td>
+                        <td>{{ supplier.supplierType }}</td>
+                        <td>{{ supplier.isActive ? 'Sí' : 'No' }}</td>
+                        <td>{{ supplier.updatedAt|date('Y-m-d H:i:s') }}</td>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Acciones">
+                                <button type="button" class="btn btn-success btn-sm mr-1" data-toggle="modal"
+                                    data-target="#editUserModal{{ supplier.id }}">Editar</button>
+                                <form action="{{ path('app_delete_supplier', {'id': supplier.id}) }}" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <div class="modal fade" id="editUserModal{{ supplier.id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="editUserModalLabel{{ supplier.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editUserModalLabel{{ supplier.id }}">Editar Usuario</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ path('app_edit_supplier', {'id': supplier.id}) }}" method="POST"
+                                        class="phone-form">
+                                        <div class="form-group">
+                                            <label for="name">Nombre:</label>
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                value="{{ supplier.name }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="email">Correo Electrónico:</label>
+                                            <input type="email" class="form-control" id="email" name="email"
+                                                value="{{ supplier.email }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="phone">Teléfono de Contacto:</label>
+                                            <input type="tel" class="form-control phone-input" name="phone"
+                                                pattern="[0-9\-\(\)\s]+" maxlength="9" value="{{ supplier.phone }}"
+                                                required data-format="123456789">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="supplierType">Tipo de Proveedor:</label>
+                                            <select class="form-control" id="supplierType" name="supplierType" required>
+                                                <option value="hotel"
+                                                    {% if supplier.supplierType == 'hotel' %}selected{% endif %}>
+                                                    Hotel
+                                                </option>
+                                                <option value="pista"
+                                                    {% if supplier.supplierType == 'pista' %}selected{% endif %}>
+                                                    Pista
+                                                </option>
+                                                <option value="complemento"
+                                                    {% if supplier.supplierType == 'complemento' %}selected{% endif %}>
+                                                    Complemento</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="isActive">Activo:</label>
+                                            <input type="checkbox" class="form-control" id="isActive" name="isActive"
+                                                {% if supplier.isActive %}checked{% endif %}>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Guardar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endset %}
+
+        {{ content }}
+    </div>
+
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Añadir Usuario</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ path('app_create_supplier') }}" method="POST" class="phone-form">
+                        <div class="form-group">
+                            <label for="name">Nombre:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Correo Electrónico:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono de Contacto:</label>
+                            <input type="tel" class="form-control phone-input" name="phone" pattern="[0-9\-\(\)\s]+"
+                                maxlength="9" required data-format="123456789">
+                        </div>
+                        <div class="form-group">
+                            <label for="supplierType">Tipo de Proveedor:</label>
+                            <select class="form-control" id="supplierType" name="supplierType" required>
+                                <option value="hotel">Hotel</option>
+                                <option value="pista">Pista</option>
+                                <option value="complemento">Complemento</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="isActive">Activo:</label>
+                            <input type="checkbox" class="form-control" id="isActive" name="isActive">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.phone-input').on('input', function () {
+                var input = $(this);
+                var value = input.val().replace(/[^\d-]/g, '');
+                var format = input.data('format');
+
+                var formattedValue = value.replace(new RegExp('.{' + format.length + '}(?!$)', 'g'),
+                    '$&-');
+
+                input.val(formattedValue);
+
+                input.attr('data-formatted-value', formattedValue);
+            });
+        });
+
+        document.getElementById('editForm').addEventListener('submit', function (event) {
+            var phoneInput = document.getElementById('phone');
+            var formattedValue = phoneInput.getAttribute('data-formatted-value');
+
+            if (formattedValue.replace(/[^0-9]/g, '').length !== 9) {
+                alert('Por favor, ingrese un número de teléfono válido.');
+                event.preventDefault();
+            }
+
+            phoneInput.value = formattedValue;
+        });
+
+        document.getElementById('addUserModal').addEventListener('submit', function (event) {
+            var phoneInput = document.getElementById('phone');
+            var formattedValue = phoneInput.getAttribute('data-formatted-value');
+
+            if (formattedValue.replace(/[^0-9]/g, '').length !== 9) {
+                alert('Por favor, ingrese un número de teléfono válido.');
+                event.preventDefault();
+            }
+
+            phoneInput.value = formattedValue;
+        });
+    </script>
+</body>
+
+</html>

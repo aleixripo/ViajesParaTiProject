@@ -1,0 +1,17 @@
+# config/routes.yaml
+
+app_supplier:
+  path: /
+  controller: App\Controller\SupplierController::index
+
+app_create_supplier:
+  path: /create
+  controller: App\Controller\SupplierController::create
+
+app_edit_supplier:
+  path: /edit/{id}
+  controller: App\Controller\SupplierController::edit
+
+app_delete_supplier:
+  path: /delete/{id}
+  controller: App\Controller\SupplierController::delete
